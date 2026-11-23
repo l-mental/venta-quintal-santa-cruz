@@ -1,0 +1,6 @@
+{
+  "name": "Abarrotes Multi-Negocio — Gestión e Inventarios",
+  "description": "Plataforma centralizada para la gestión independiente de tres negocios mayoristas de abarrotes: inventarios por quintal y kilo, compras, ventas, cuentas por cobrar/pagar, préstamos y operaciones entre negocios.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
