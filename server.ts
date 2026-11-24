@@ -2,7 +2,6 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { createServer as createViteServer } from 'vite';
 import { createInitialDatabase } from './server/seed.ts';
 import type {
   BusinessId,
@@ -21,7 +20,9 @@ import type {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DATA_DIR = path.join(__dirname, 'data');
+const DATA_DIR = process.env.VERCEL
+  ? path.join('/tmp', 'abarrotes-data')
+  : path.join(__dirname, 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 const BACKUPS_DIR = path.join(DATA_DIR, 'backups');
 
@@ -153,7 +154,7 @@ function resolveSession(
   return { user, businessId: user.negocioId };
 }
 
-async function startServer() {
+export function createApiApp(): express.Express {
   const app = express();
   app.use(express.json({ limit: '5mb' }));
 
@@ -1972,8 +1973,15 @@ async function startServer() {
     res.json({ simulation: sim });
   });
 
+  return app;
+}
+
+async function startServer() {
+  const app = createApiApp();
+
   // Vite Dev Middleware or Static Production Serving
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
@@ -1993,4 +2001,6 @@ async function startServer() {
   });
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
